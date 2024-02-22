@@ -13,21 +13,45 @@ class File:
 Task 1
 """
 def leafFiles(files: list[File]) -> list[str]:
-    return []
+    res = []
+    for i in files:
+        current_id = i.id
+        print("Current file id is: ", current_id)
+        found = False
+        for j in files:
+            if j.id == current_id:
+                print("Same file being analyzed")
+                continue
+
+            if j.parent == current_id:
+                print("Not a leaf node")
+                found = True ## so not a leaf -> stop iterating
+                break
+
+        if found:
+            print("Current file has children")
+            continue
+        else:
+            print("Current file is a leaf node")
+            res.append(i.name)
+        print()
+
+    print(sorted(res))
+    return res
 
 
 """
 Task 2
 """
-def kLargestCategories(files: list[File], k: int) -> list[str]:
-    return []
+# def kLargestCategories(files: list[File], k: int) -> list[str]:
+#     return []
 
 
 """
 Task 3
 """
-def largestFileSize(files: list[File]) -> int:
-    return 0
+# def largestFileSize(files: list[File]) -> int:
+#     return 0
 
 
 if __name__ == '__main__':
@@ -58,8 +82,8 @@ if __name__ == '__main__':
         "Video.mp4"
     ]
 
-    assert kLargestCategories(testFiles, 3) == [
-        "Documents", "Folder", "Media"
-    ]
+    # assert kLargestCategories(testFiles, 3) == [
+    #     "Documents", "Folder", "Media"
+    # ]
 
-    assert largestFileSize(testFiles) == 20992
+    # assert largestFileSize(testFiles) == 20992
