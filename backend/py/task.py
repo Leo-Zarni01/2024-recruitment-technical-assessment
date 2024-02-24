@@ -14,29 +14,29 @@ class Node:
 
 class Graph:
     def __init__(self):
-        self.list_of_nodes = []
+        self.list_of_adj_lists = []
 
     def add_node(self, node: Node):
         current_list = []
         current_list.append(node)
-        self.list_of_nodes.append(current_list)
+        self.list_of_adj_lists.append(current_list)
 
     def add_edge(self, source: int, target: int):
         print("Source is: ", source, " and target is: ", target)
-        current_list = self.list_of_nodes[source] 
-        target_node = self.list_of_nodes[target][0]
+        current_list = self.list_of_adj_lists[source] 
+        target_node = self.list_of_adj_lists[target][0]
         current_list.append(target_node)
 
     def check_edge(self, source: int, target: int) -> bool:
-        current_list = self.list_of_nodes[source]
-        target_node = self.list_of_nodes[target][0]
+        current_list = self.list_of_adj_lists[source]
+        target_node = self.list_of_adj_lists[target][0]
         for node in current_list:
             if node == target_node:
                 return True
         return False
     
     def print_graph(self):
-        for adj_list in self.list_of_nodes:
+        for adj_list in self.list_of_adj_lists:
             print("Current node is: ", adj_list[0].vertex.id)
             print(f"It has {len(adj_list) - 1} neighbors")
             for each_node in adj_list:
@@ -52,6 +52,7 @@ def convert_files_to_graph(files: list[File]) -> Graph:
         file_node = Node(files[i])
         file_graph.add_node(file_node)
 
+    ## then check for edges
     for i in range(len(files)):
         for j in range(len(files)):
             if files[i].parent == files[j].id:
@@ -62,57 +63,17 @@ def convert_files_to_graph(files: list[File]) -> Graph:
                     file_graph.add_edge(i, j)
     return file_graph
 
-testFiles = [File(1, "Document.txt", ["Documents"], 3, 1024),
-        File(2, "Image.jpg", ["Media", "Photos"], 34, 2048),
-        File(3, "Folder", ["Folder"], -1, 0),
-        File(5, "Spreadsheet.xlsx", ["Documents", "Excel"], 3, 4096),
-        File(8, "Backup.zip", ["Backup"], 233, 8192),
-        File(13, "Presentation.pptx", ["Documents", "Presentation"], 3, 3072),
-        File(21, "Video.mp4", ["Media", "Videos"], 34, 6144),
-        File(34, "Folder2", ["Folder"], 3, 0),
-        File(55, "Code.py", ["Programming"], -1, 1536),
-        File(89, "Audio.mp3", ["Media", "Audio"], 34, 2560),
-        File(144, "Spreadsheet2.xlsx", ["Documents", "Excel"], 3, 2048),
-        File(233, "Folder3", ["Folder"], -1, 4096),]
-
-file_g = convert_files_to_graph(testFiles)
-file_g.print_graph()
-
-
 """
 Task 1
 """
 def leafFiles(files: list[File]) -> list[str]:
     res = []
-    
-    # for i in files:
-    #     current_id = i.id
-    #     print("Current file id is: ", current_id)
-    #     found = False
-    #     for j in files:
-    #         if j.id == current_id:
-    #             print("Same file being analyzed")
-    #             continue
-
-    #         if j.parent == current_id:
-    #             print("Not a leaf node")
-    #             found = True ## so not a leaf -> stop iterating
-    #             break
-
-    #     if found:
-    #         print("Current file has children")
-    #         continue
-    #     else:
-    #         print("Current file is a leaf node")
-    #         res.append(i.name)
-    #     print()
-
-    # print(sorted(res))
-
-
+    file_graph = convert_files_to_graph(files)
+    for each_list in file_graph.list_of_adj_lists:
+        if len(each_list) == 1:
+            res.append(each_list[0].vertex.name)
     return res
-
-
+    
 """
 Task 2
 """
@@ -141,33 +102,33 @@ Task 3
 
 # leafFiles(testFiles)
 
-# if __name__ == '__main__':
-#     testFiles = [
-#         File(1, "Document.txt", ["Documents"], 3, 1024),
-#         File(2, "Image.jpg", ["Media", "Photos"], 34, 2048),
-#         File(3, "Folder", ["Folder"], -1, 0),
-#         File(5, "Spreadsheet.xlsx", ["Documents", "Excel"], 3, 4096),
-#         File(8, "Backup.zip", ["Backup"], 233, 8192),
-#         File(13, "Presentation.pptx", ["Documents", "Presentation"], 3, 3072),
-#         File(21, "Video.mp4", ["Media", "Videos"], 34, 6144),
-#         File(34, "Folder2", ["Folder"], 3, 0),
-#         File(55, "Code.py", ["Programming"], -1, 1536),
-#         File(89, "Audio.mp3", ["Media", "Audio"], 34, 2560),
-#         File(144, "Spreadsheet2.xlsx", ["Documents", "Excel"], 3, 2048),
-#         File(233, "Folder3", ["Folder"], -1, 4096),
-#     ]
+if __name__ == '__main__':
+    testFiles = [
+        File(1, "Document.txt", ["Documents"], 3, 1024),
+        File(2, "Image.jpg", ["Media", "Photos"], 34, 2048),
+        File(3, "Folder", ["Folder"], -1, 0),
+        File(5, "Spreadsheet.xlsx", ["Documents", "Excel"], 3, 4096),
+        File(8, "Backup.zip", ["Backup"], 233, 8192),
+        File(13, "Presentation.pptx", ["Documents", "Presentation"], 3, 3072),
+        File(21, "Video.mp4", ["Media", "Videos"], 34, 6144),
+        File(34, "Folder2", ["Folder"], 3, 0),
+        File(55, "Code.py", ["Programming"], -1, 1536),
+        File(89, "Audio.mp3", ["Media", "Audio"], 34, 2560),
+        File(144, "Spreadsheet2.xlsx", ["Documents", "Excel"], 3, 2048),
+        File(233, "Folder3", ["Folder"], -1, 4096),
+    ]
 
-#     assert sorted(leafFiles(testFiles)) == [
-#         "Audio.mp3",
-#         "Backup.zip",
-#         "Code.py",
-#         "Document.txt",
-#         "Image.jpg",
-#         "Presentation.pptx",
-#         "Spreadsheet.xlsx",
-#         "Spreadsheet2.xlsx",
-#         "Video.mp4"
-#     ]
+    assert sorted(leafFiles(testFiles)) == [
+        "Audio.mp3",
+        "Backup.zip",
+        "Code.py",
+        "Document.txt",
+        "Image.jpg",
+        "Presentation.pptx",
+        "Spreadsheet.xlsx",
+        "Spreadsheet2.xlsx",
+        "Video.mp4"
+    ]
 
     # assert kLargestCategories(testFiles, 3) == [
     #     "Documents", "Folder", "Media"
