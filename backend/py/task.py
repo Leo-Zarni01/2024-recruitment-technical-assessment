@@ -122,30 +122,33 @@ def largestFileSize(files: list[File]) -> int:
                 neighbour_file = each_list_2[i].vertex.id
                 visited[neighbour_file][0] = True
                 sum += each_list_2[i].vertex.size
-                visited[neighbour_file][1] = sum
-                print(f"Updated, now neighbour file {neighbour_file} is visited, and its sum is {sum}")
+                if each_list_2[i].vertex.id != current_head:
+                    neighbor_sum = each_list_2[i].vertex.size + each_list_2[0].vertex.size ## size of current_head
+                    visited[neighbour_file][1] = neighbor_sum
+                print(f"Updated, now neighbour file {neighbour_file} is visited, and its size is {visited[neighbour_file][1]}")
             print(f"The sum of all the files starting from {each_list_2[0].vertex.id} is {sum}")
             sizes.append(sum)            
         else:
-            print(f"The current file {current_head} has been visited and its sum is: {each_list_2[0].vertex.size}")
+            print(f"The current file {current_head} has been visited and its sum is: {visited[current_head][1]}")
             parent = each_list_2[0].vertex.parent
             if visited[parent][0]:
                 print("Parent has already been visited.")
+                visited[current_head][1] = visited[parent][1] + each_list_2[0].vertex.size
             else:
                 print("Parent not yet visited => brand new")
         print()
     return 0
 
-
+# change file size of file 3 see what happens
 testFiles = [
         File(1, "Document.txt", ["Documents"], 3, 1024),
-        File(2, "Image.jpg", ["Media", "Photos"], 34, 2048),
-        File(3, "Folder", ["Folder"], -1, 0),
+        File(3, "Folder", ["Folder"], -1, 100),
         File(5, "Spreadsheet.xlsx", ["Documents", "Excel"], 3, 4096),
         File(8, "Backup.zip", ["Backup"], 233, 8192),
         File(13, "Presentation.pptx", ["Documents", "Presentation"], 3, 3072),
         File(21, "Video.mp4", ["Media", "Videos"], 34, 6144),
         File(34, "Folder2", ["Folder"], 3, 0),
+        File(2, "Image.jpg", ["Media", "Photos"], 34, 2048),
         File(55, "Code.py", ["Programming"], -1, 1536),
         File(89, "Audio.mp3", ["Media", "Audio"], 34, 2560),
         File(144, "Spreadsheet2.xlsx", ["Documents", "Excel"], 3, 2048),
