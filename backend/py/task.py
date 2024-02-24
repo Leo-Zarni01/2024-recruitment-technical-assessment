@@ -22,7 +22,7 @@ class Graph:
         self.list_of_adj_lists.append(current_list)
 
     def add_edge(self, source: int, target: int):
-        print("Source is: ", source, " and target is: ", target)
+        # print("Source is: ", source, " and target is: ", target)
         current_list = self.list_of_adj_lists[source] 
         target_node = self.list_of_adj_lists[target][0]
         current_list.append(target_node)
@@ -74,7 +74,7 @@ def find_categories(files: list[File]) -> dict:
     return categories
 
 def sort_categories(categories_dict: dict) -> dict:
-    return sorted(categories.items(), key=lambda x: (-x[1], x[0]))
+    return sorted(categories_dict.items(), key=lambda x: (-x[1], x[0]))
 
 
 """
@@ -105,10 +105,32 @@ def kLargestCategories(files: list[File], k: int) -> list[str]:
 """
 Task 3
 """
-# def largestFileSize(files: list[File]) -> int:
-#     return 0
+def largestFileSize(files: list[File]) -> int:
+    sizes = []
+    visited = {}
+    file_graph = convert_files_to_graph(files)
+    for each_list in file_graph.list_of_adj_lists:
+        visited[each_list[0].vertex.id] = False
 
-testFiles = [File(1, "Document.txt", ["Documents"], 3, 1024),
+    for each_list_2 in file_graph.list_of_adj_lists:
+        current_head = each_list_2[0].vertex.id
+        if not visited[current_head]:
+            print(f"current head {current_head} has not yet been visited!")
+            sum = 0
+            for i in range(len(each_list_2)):
+                neighbour_file = each_list_2[i].vertex.id
+                visited[neighbour_file] = True
+                sum += each_list_2[i].vertex.size
+            print(f"The sum of all the files starting from {each_list_2[0].vertex.id} is {sum}")
+            sizes.append(sum)            
+        else:
+            print(f"The current file {current_head} has been visited.")
+        print()
+    return 0
+
+
+testFiles = [
+        File(1, "Document.txt", ["Documents"], 3, 1024),
         File(2, "Image.jpg", ["Media", "Photos"], 34, 2048),
         File(3, "Folder", ["Folder"], -1, 0),
         File(5, "Spreadsheet.xlsx", ["Documents", "Excel"], 3, 4096),
@@ -119,13 +141,17 @@ testFiles = [File(1, "Document.txt", ["Documents"], 3, 1024),
         File(55, "Code.py", ["Programming"], -1, 1536),
         File(89, "Audio.mp3", ["Media", "Audio"], 34, 2560),
         File(144, "Spreadsheet2.xlsx", ["Documents", "Excel"], 3, 2048),
-        File(233, "Folder3", ["Folder"], -1, 4096),]
+        File(233, "Folder3", ["Folder"], -1, 4096),
+        ]
 
-categories = find_categories(testFiles)
-print(categories)
-print(sort_categories(categories))
-print(kLargestCategories(testFiles, 3))
-# leafFiles(testFiles)
+largestFileSize(testFiles)
+# testFiles2 = [
+#     File(3, "Folder", ["Folder"], -1, 0),
+#     File(1, "Document.txt", ["Documents"], 3, 1024),
+# ]
+
+# graph_2 = convert_files_to_graph(testFiles2)
+# graph_2.print_graph()
 
 # if __name__ == '__main__':
 #     testFiles = [
