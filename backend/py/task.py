@@ -110,21 +110,29 @@ def largestFileSize(files: list[File]) -> int:
     visited = {}
     file_graph = convert_files_to_graph(files)
     for each_list in file_graph.list_of_adj_lists:
-        visited[each_list[0].vertex.id] = False
+        visited[each_list[0].vertex.id] = [False, each_list[0].vertex.size] ## for inner processing
 
     for each_list_2 in file_graph.list_of_adj_lists:
         current_head = each_list_2[0].vertex.id
-        if not visited[current_head]:
+        print(f"current head is: {current_head}")
+        if not visited[current_head][0]:
             print(f"current head {current_head} has not yet been visited!")
             sum = 0
             for i in range(len(each_list_2)):
                 neighbour_file = each_list_2[i].vertex.id
-                visited[neighbour_file] = True
+                visited[neighbour_file][0] = True
                 sum += each_list_2[i].vertex.size
+                visited[neighbour_file][1] = sum
+                print(f"Updated, now neighbour file {neighbour_file} is visited, and its sum is {sum}")
             print(f"The sum of all the files starting from {each_list_2[0].vertex.id} is {sum}")
             sizes.append(sum)            
         else:
-            print(f"The current file {current_head} has been visited.")
+            print(f"The current file {current_head} has been visited and its sum is: {each_list_2[0].vertex.size}")
+            parent = each_list_2[0].vertex.parent
+            if visited[parent][0]:
+                print("Parent has already been visited.")
+            else:
+                print("Parent not yet visited => brand new")
         print()
     return 0
 
@@ -143,6 +151,9 @@ testFiles = [
         File(144, "Spreadsheet2.xlsx", ["Documents", "Excel"], 3, 2048),
         File(233, "Folder3", ["Folder"], -1, 4096),
         ]
+
+graph = convert_files_to_graph(testFiles)
+graph.print_graph()
 
 largestFileSize(testFiles)
 # testFiles2 = [
