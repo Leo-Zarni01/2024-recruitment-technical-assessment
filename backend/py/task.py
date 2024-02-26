@@ -135,16 +135,12 @@ Task 3
 """
 def largestFileSize(files: list[File]) -> int:
     sizes = []
-    leaf_nodes = []
     ancient_nodes = []
     file_graph = convert_files_to_graph(files)
 
     for i in range(len(file_graph.list_of_adj_lists)):
         each_adj = file_graph.list_of_adj_lists[i]
         current_head = each_adj[0]
-
-        if len(each_adj) == 1:
-            leaf_nodes.append(current_head.vertex.id)
         
         if current_head.vertex.parent == -1:
             ancient_nodes.append(current_head)
