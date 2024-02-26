@@ -6,7 +6,7 @@ Since we will be working on a file system with a **parent-child** relationship, 
 
 ## $\text{Task 1}$.
 
-There are also helper functions which I have defined; most of them are obvious in what they do, but I think it is worth mentioning what `dfs()` does --- I will talk about it in my explanation for Task 3.
+There are also helper functions which I have defined; most of them are obvious in what they do, but I think it is worth mentioning what `dfs()` does $\large -$ I will talk about it in my explanation for Task 3.
 
 Task 1 was pretty straighforward. First, I converted the `Files` array into a directed graph. Since my graph representation is in a form of adjacency list, to determine whether a `File` is a _leaf_ file (node) or not, I just have to see the length of the adjacency list for each file. If the length of the adjacency list for file `X` is $\large 1$, then `X` is a _leaf_ file.
 
