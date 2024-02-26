@@ -44,6 +44,9 @@ class Graph:
                     print("Neighbors are: ", each_node.vertex.id)
             print()
 
+    def size(self) -> int:
+        return len(self.list_of_adj_lists)
+
 def convert_files_to_graph(files: list[File]) -> Graph:
     file_graph = Graph()
 
@@ -77,6 +80,31 @@ def sort_categories(categories_dict: dict) -> dict:
     return sorted(categories_dict.items(), key=lambda x: (-x[1], x[0]))
 
 
+
+def dfs(g: Graph, lookup_file: File) -> int:
+    files_visited = {}
+    for i in range(g.size()):
+        each_adj = g.list_of_adj_lists[i]
+        current_head = each_adj[0]
+
+        if current_head not in files_visited:
+            files_visited[current_head] = [False, i]
+
+    stack = [lookup_file]
+    size = 0
+    while len(stack) > 0:
+        v = stack.pop() ## type is File
+        size += v.vertex.size
+        # print(f"Current file is {v.vertex.id}")
+        if files_visited[v][0] == False:
+            files_visited[v][0] = True
+            reference_index = files_visited[v][1]
+            adj_list = g.list_of_adj_lists[reference_index]
+            neighbors = adj_list[1:] ## careful when len = 1
+            for j in range(len(neighbors)):
+                if files_visited[neighbors[j]][0] == False:
+                    stack.append(neighbors[j])
+    return size
 """
 Task 1
 """
@@ -99,7 +127,7 @@ def kLargestCategories(files: list[File], k: int) -> list[str]:
     res = []
     for i in range(len(sorted_categories)):
         if i <= k - 1: ## cuz index is 0!!!
-            res.append(sorted_categories[i])
+            res.append(sorted_categories[i][0])
     return res
 
 """
@@ -107,42 +135,29 @@ Task 3
 """
 def largestFileSize(files: list[File]) -> int:
     sizes = []
-    visited = {}
+    leaf_nodes = []
+    ancient_nodes = []
     file_graph = convert_files_to_graph(files)
-    for each_list in file_graph.list_of_adj_lists:
-        visited[each_list[0].vertex.id] = [False, each_list[0].vertex.size] ## for inner processing
 
-    for each_list_2 in file_graph.list_of_adj_lists:
-        current_head = each_list_2[0].vertex.id
-        print(f"current head is: {current_head}")
-        if not visited[current_head][0]:
-            print(f"current head {current_head} has not yet been visited!")
-            sum = 0
-            for i in range(len(each_list_2)):
-                neighbour_file = each_list_2[i].vertex.id
-                visited[neighbour_file][0] = True
-                sum += each_list_2[i].vertex.size
-                if each_list_2[i].vertex.id != current_head:
-                    neighbor_sum = each_list_2[i].vertex.size + each_list_2[0].vertex.size ## size of current_head
-                    visited[neighbour_file][1] = neighbor_sum
-                print(f"Updated, now neighbour file {neighbour_file} is visited, and its size is {visited[neighbour_file][1]}")
-            print(f"The sum of all the files starting from {each_list_2[0].vertex.id} is {sum}")
-            sizes.append(sum)            
-        else:
-            print(f"The current file {current_head} has been visited and its sum is: {visited[current_head][1]}")
-            parent = each_list_2[0].vertex.parent
-            if visited[parent][0]:
-                print("Parent has already been visited.")
-                visited[current_head][1] = visited[parent][1] + each_list_2[0].vertex.size
-            else:
-                print("Parent not yet visited => brand new")
-        print()
-    return 0
+    for i in range(len(file_graph.list_of_adj_lists)):
+        each_adj = file_graph.list_of_adj_lists[i]
+        current_head = each_adj[0]
 
-# change file size of file 3 see what happens
+        if len(each_adj) == 1:
+            leaf_nodes.append(current_head.vertex.id)
+        
+        if current_head.vertex.parent == -1:
+            ancient_nodes.append(current_head)
+            # ancient_nodes.append((current_head, i))
+
+    for each_file in ancient_nodes:
+        # dfs(file_graph, each_file)
+        sizes.append(dfs(file_graph, each_file))
+    return max(sizes)
+
 testFiles = [
         File(1, "Document.txt", ["Documents"], 3, 1024),
-        File(3, "Folder", ["Folder"], -1, 100),
+        File(3, "Folder", ["Folder"], -1, 0),
         File(5, "Spreadsheet.xlsx", ["Documents", "Excel"], 3, 4096),
         File(8, "Backup.zip", ["Backup"], 233, 8192),
         File(13, "Presentation.pptx", ["Documents", "Presentation"], 3, 3072),
@@ -156,19 +171,9 @@ testFiles = [
         ]
 
 graph = convert_files_to_graph(testFiles)
-graph.print_graph()
+# graph.print_graph()
 
-largestFileSize(testFiles)
-# testFiles2 = [
-#     File(3, "Folder", ["Folder"], -1, 0),
-#     File(1, "Document.txt", ["Documents"], 3, 1024),
-# ]
-
-# graph_2 = convert_files_to_graph(testFiles2)
-# graph_2.print_graph()
-
-# if __name__ == '__main__':
-#     testFiles = [
+# testFiles = [
 #         File(1, "Document.txt", ["Documents"], 3, 1024),
 #         File(2, "Image.jpg", ["Media", "Photos"], 34, 2048),
 #         File(3, "Folder", ["Folder"], -1, 0),
@@ -183,20 +188,45 @@ largestFileSize(testFiles)
 #         File(233, "Folder3", ["Folder"], -1, 4096),
 #     ]
 
-#     assert sorted(leafFiles(testFiles)) == [
-#         "Audio.mp3",
-#         "Backup.zip",
-#         "Code.py",
-#         "Document.txt",
-#         "Image.jpg",
-#         "Presentation.pptx",
-#         "Spreadsheet.xlsx",
-#         "Spreadsheet2.xlsx",
-#         "Video.mp4"
-#     ]
 
-#     # assert kLargestCategories(testFiles, 3) == [
-#     #     "Documents", "Folder", "Media"
-#     # ]
+# testFiles2 = [
+#     File(3, "Folder", ["Folder"], -1, 0),
+#     File(1, "Document.txt", ["Documents"], 3, 1024),
+# ]
 
-#     # assert largestFileSize(testFiles) == 20992
+# graph_2 = convert_files_to_graph(testFiles2)
+# graph_2.print_graph()
+
+if __name__ == '__main__':
+    testFiles = [
+        File(1, "Document.txt", ["Documents"], 3, 1024),
+        File(2, "Image.jpg", ["Media", "Photos"], 34, 2048),
+        File(3, "Folder", ["Folder"], -1, 0),
+        File(5, "Spreadsheet.xlsx", ["Documents", "Excel"], 3, 4096),
+        File(8, "Backup.zip", ["Backup"], 233, 8192),
+        File(13, "Presentation.pptx", ["Documents", "Presentation"], 3, 3072),
+        File(21, "Video.mp4", ["Media", "Videos"], 34, 6144),
+        File(34, "Folder2", ["Folder"], 3, 0),
+        File(55, "Code.py", ["Programming"], -1, 1536),
+        File(89, "Audio.mp3", ["Media", "Audio"], 34, 2560),
+        File(144, "Spreadsheet2.xlsx", ["Documents", "Excel"], 3, 2048),
+        File(233, "Folder3", ["Folder"], -1, 4096),
+    ]
+
+    assert sorted(leafFiles(testFiles)) == [
+        "Audio.mp3",
+        "Backup.zip",
+        "Code.py",
+        "Document.txt",
+        "Image.jpg",
+        "Presentation.pptx",
+        "Spreadsheet.xlsx",
+        "Spreadsheet2.xlsx",
+        "Video.mp4"
+    ]
+
+    assert kLargestCategories(testFiles, 3) == [
+        "Documents", "Folder", "Media"
+    ]
+
+    assert largestFileSize(testFiles) == 20992
